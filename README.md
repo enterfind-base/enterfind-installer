@@ -1,5 +1,7 @@
 # Enterfind installer
 
+> Enterfind and its installer are in beta. Expect changes between releases, and please report problems you run into.
+
 One program that installs [Enterfind](https://enterfind.com) on your computer and keeps it
 running: the Enterfind server, the Java runtime it needs, a PostgreSQL database, and Tesseract
 for reading text in images and scanned documents. Everything goes into one folder in your home
@@ -19,6 +21,7 @@ system-wide.
 - [Troubleshooting](#troubleshooting)
 - [WSL2](#wsl2)
 - [What is installed where](#what-is-installed-where)
+- [License](#license)
 
 > **Testers, before the first public release**: read [Testing a release
 > candidate](#testing-a-release-candidate) at the end first. The one-line installs below do not
@@ -114,10 +117,11 @@ Every file in a release has a `.sha256` next to it, to check the download
 It shows the settings it will use and offers to change them before anything is downloaded:
 
 - **Port**: 8080, or the next free one.
-- **Reach**: this computer only (the default), or all networks. Enterfind has no user accounts
-  and no HTTPS of its own: on all networks, anyone who can reach the computer can search your
-  documents. To use Enterfind from elsewhere, prefer its built-in remote access (an invitation
-  code, set up in Enterfind's settings) to opening it to the network.
+- **Reach**: this computer only (the default), or all networks. Enterfind starts with
+  authentication off (you can turn it on and add users in Enterfind itself) and has no HTTPS of
+  its own: on all networks, until authentication is on, anyone who can reach the computer can
+  search your documents. To use Enterfind from elsewhere, prefer its built-in remote access (an
+  invitation code, set up in Enterfind's settings) to opening it to the network.
 - **Java memory** and **PostgreSQL tuning**: computed from the computer's memory and processors.
 - **Autostart**: start Enterfind with the computer and keep it running (yes by default; see
   [Running in the background](#running-in-the-background)).
@@ -372,9 +376,17 @@ Everything is in `~/.enterfind` (Windows: `%USERPROFILE%\.enterfind`):
 Outside it, only the autostart entry (see [Running in the background](#running-in-the-background)).
 PostgreSQL listens on `127.0.0.1` only, with generated passwords.
 
-The installer is built with Deno; [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) lists the software
-it contains and their licenses. The components it downloads come with their own licenses in
-their folders under `runtime/`.
+## License
+
+The installer (`enterfind`) is MIT-licensed, Copyright (c) 2026 Mikhail Garber: see
+[LICENSE](LICENSE). It is built with Deno; [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) lists the
+software it contains and their licenses.
+
+**The Enterfind server is not covered by this license.** The installer downloads it from its
+own releases, and it is licensed under the
+[GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html)
+(AGPL-3.0). The other components the installer downloads (Java, PostgreSQL, Tesseract and its
+models) come under their own licenses, which are in their folders under `runtime/`.
 
 ## Testing a release candidate
 
