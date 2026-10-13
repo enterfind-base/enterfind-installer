@@ -366,7 +366,7 @@ Everything is in `~/.enterfind` (Windows: `%USERPROFILE%\.enterfind`):
 |---|---|
 | `bin/` | the installer's own copy; autostart runs it |
 | `app/` | the Enterfind server |
-| `runtime/` | Java (Eclipse Temurin), PostgreSQL, Tesseract with its language models |
+| `runtime/` | Java (Eclipse Temurin), PostgreSQL, Tesseract with its language models; on Windows, Java and PostgreSQL also get Microsoft's Visual C++ runtime in their `bin` folders, so they do not depend on the Visual C++ Redistributable being installed |
 | `data/` | the database |
 | `models/` | the server's AI models, downloaded by the server |
 | `config/` | `enterfind.toml` (settings), `secrets.json` (generated passwords and key; private) |
@@ -386,7 +386,9 @@ software it contains and their licenses.
 own releases, and it is licensed under the
 [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html)
 (AGPL-3.0). The other components the installer downloads (Java, PostgreSQL, Tesseract and its
-models) come under their own licenses, which are in their folders under `runtime/`.
+models) come under their own licenses, which are in their folders under `runtime/`. On Windows,
+the Microsoft Visual C++ runtime (taken from conda-forge's `vc14_runtime` package) comes under
+Microsoft's [Visual C++ Runtime license terms](https://aka.ms/VCRedistLicense).
 
 ## Testing a release candidate
 
