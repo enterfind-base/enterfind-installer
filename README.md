@@ -98,7 +98,8 @@ browser. A download in a terminal, as above, is not affected. Go to the [latest
 release](https://github.com/enterfind-base/enterfind-installer/releases/latest), then:
 
 - **macOS**: download `enterfind-aarch64-apple-darwin.zip` (Intel:
-  `enterfind-x86_64-apple-darwin.zip`). Safari unpacks it; otherwise double-click the `.zip`.
+  `enterfind-x86_64-apple-darwin.zip`). Safari unpacks it by itself (unless "Open safe files
+  after downloading" is off in its settings); otherwise double-click the `.zip`.
   Double-click the unpacked `enterfind-…-apple-darwin`. macOS refuses it the first time
   ("cannot be opened because Apple cannot check it for malicious software"): click **Done**,
   open **System Settings › Privacy & Security**, scroll down to the message about
