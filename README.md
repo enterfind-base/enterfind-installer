@@ -383,8 +383,8 @@ The installer (`enterfind`) is MIT-licensed, Copyright (c) 2026 Mikhail Garber: 
 software it contains and their licenses.
 
 **The Enterfind server is not covered by this license.** The installer downloads it from its
-own releases, and it is licensed under the
-[GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html)
+own [releases](https://github.com/enterfind-base/enterfind-server/releases), and it is licensed
+under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html)
 (AGPL-3.0). The other components the installer downloads (Java, PostgreSQL, Tesseract and its
 models) come under their own licenses, which are in their folders under `runtime/`. On Windows,
 the Microsoft Visual C++ runtime (taken from conda-forge's `vc14_runtime` package) comes under
@@ -405,14 +405,6 @@ The releases repository is private for now, so:
   (`--pattern` takes the file name from [Requirements](#requirements); `gh release download
   v0.1.N …` for a particular release.) The one-line installs do not work until the repository
   is public.
-- **Server jar**: the server's own releases are not public yet either. Before running the
-  installer, point it at a test build of the server:
-  ```sh
-  export ENTERFIND_SERVER_JAR_URL=https://enterfind.com/tempo-server/enterfind-server.jar
-  ```
-  (PowerShell: `$env:ENTERFIND_SERVER_JAR_URL = "https://enterfind.com/tempo-server/enterfind-server.jar"`.)
-  Set it for every command that installs or updates. The installer notes that the jar is
-  unverified when no `.sha256` is published next to it.
 - **Updates of the installer** need a GitHub token that can read the releases repository, since
   the update check and the download go through the GitHub API:
   ```sh
