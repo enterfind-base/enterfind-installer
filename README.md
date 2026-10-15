@@ -23,10 +23,6 @@ system-wide.
 - [What is installed where](#what-is-installed-where)
 - [License](#license)
 
-> **Testers, before the first public release**: read [Testing a release
-> candidate](#testing-a-release-candidate) at the end first. The one-line installs below do not
-> work yet.
-
 ## Requirements
 
 | System | Version | Download |
@@ -390,28 +386,3 @@ under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/
 models) come under their own licenses, which are in their folders under `runtime/`. On Windows,
 the Microsoft Visual C++ runtime (taken from conda-forge's `vc14_runtime` package) comes under
 Microsoft's [Visual C++ Runtime license terms](https://aka.ms/VCRedistLicense).
-
-## Testing a release candidate
-
-> This section is for testers until the first public release, and goes away then.
-
-The releases repository is private for now, so:
-
-- **Download** the installer with a browser signed in to GitHub (from the release page, see
-  [With a browser](#with-a-browser)), or with the GitHub CLI:
-  ```sh
-  gh release download --repo enterfind-base/enterfind-installer --pattern enterfind-x86_64-unknown-linux-gnu
-  chmod +x enterfind-x86_64-unknown-linux-gnu && ./enterfind-x86_64-unknown-linux-gnu
-  ```
-  (`--pattern` takes the file name from [Requirements](#requirements); `gh release download
-  v0.1.N …` for a particular release.) The one-line installs do not work until the repository
-  is public.
-- **Updates of the installer** need a GitHub token that can read the releases repository, since
-  the update check and the download go through the GitHub API:
-  ```sh
-  export GITHUB_TOKEN=$(gh auth token)
-  ```
-  (PowerShell: `$env:GITHUB_TOKEN = gh auth token`.) Without it, the installer cannot see its
-  releases and says so, which is not an error.
-
-Report what this guide gets wrong or leaves out along with the test reports.
