@@ -1,6 +1,6 @@
 # Enterfind installer
 
-> Enterfind and its installer are in beta. Expect changes between releases, and please report problems you run into.
+> Enterfind and its installer are in beta. Expect changes between releases, and please report problems you run into at https://github.com/enterfind-base/enterfind-server/issues.
 
 One program that installs [Enterfind](https://enterfind.com) on your computer and keeps it
 running: the Enterfind server, the Java runtime it needs, a PostgreSQL database, and Tesseract
@@ -272,8 +272,10 @@ enterfind doctor             # checks with a pass/warn/fail each
 ```
 
 The log files are in `~/.enterfind/logs/` (`installer.log` is the installer's own, including
-what autostart did) and `~/.enterfind/data/postgres/log/`. When you report a problem, include
-the output of `enterfind doctor` and `enterfind status`, and the end of the log it points to.
+what autostart did) and `~/.enterfind/data/postgres/log/`. Report problems with Enterfind or
+the installer in the [Enterfind server's issues](https://github.com/enterfind-base/enterfind-server/issues),
+and include the output of `enterfind doctor` and `enterfind status`, and the end of the log it
+points to.
 
 ## Uninstall
 
