@@ -16,6 +16,7 @@ system-wide.
 - [Commands](#commands)
 - [Updates](#updates)
 - [Settings](#settings)
+- [Behind a proxy](#behind-a-proxy)
 - [Logs and diagnostics](#logs-and-diagnostics)
 - [Uninstall](#uninstall)
 - [Troubleshooting](#troubleshooting)
@@ -42,7 +43,8 @@ Also needed:
 - **Memory**: 4 GB or more is comfortable. The installer sizes Java and PostgreSQL to the
   computer's memory (about 40% of it together).
 - **Network**: about 700 MB is downloaded from GitHub, Adoptium (Java) and Maven Central
-  (PostgreSQL) during the install, and less for updates.
+  (PostgreSQL) during the install, and less for updates. Behind a proxy, see
+  [Behind a proxy](#behind-a-proxy).
 - **Linux**: `tar`, and for starting at boot either systemd (as a user service) or a cron
   daemon. Most distributions have all of them.
 
@@ -122,6 +124,8 @@ It shows the settings it will use and offers to change them before anything is d
 - **Java memory** and **PostgreSQL tuning**: computed from the computer's memory and processors.
 - **Autostart**: start Enterfind with the computer and keep it running (yes by default; see
   [Running in the background](#running-in-the-background)).
+- **Proxy**: taken from `HTTPS_PROXY` in the terminal, or on Windows and macOS from the
+  computer's proxy settings; "none" when there is none (see [Behind a proxy](#behind-a-proxy)).
 
 Then it shows the plan and the download size and asks once more. A download that drops is
 retried; an install that fails stops what it started and can simply be run again.
@@ -192,13 +196,13 @@ needs a confirmation takes `--yes`. In the examples, `enterfind` stands for your
 
 | Command | What it does |
 |---|---|
-| `install` | install with the defaults and start; options `--port <port>`, `--bind local\|all`, `--heap <size>` (e.g. `2g`), `--pg-tune auto\|KEY=VALUE` (repeatable), `--no-autostart` |
+| `install` | install with the defaults and start; options `--port <port>`, `--bind local\|all`, `--heap <size>` (e.g. `2g`), `--pg-tune auto\|KEY=VALUE` (repeatable), `--no-autostart`, `--proxy <url>\|system\|none`, `--proxy-bypass <hosts>\|none` |
 | `status` | versions, processes, health, the address and known updates; `--check-updates` checks first |
 | `start` | start Enterfind and keep it running (ends a `stop`) |
 | `stop` | stop Enterfind; autostart leaves it off until `start` |
 | `restart` | stop and start |
 | `update` | list (`--check`) or install (`--yes`) updates; `--only app,jre,postgres,tesseract,installer` |
-| `config` | no options: print the settings; with `--port`, `--bind`, `--heap`, `--pg-tune`, `--autostart`, `--no-autostart`: change them and restart what they affect |
+| `config` | no options: print the settings; with `--port`, `--bind`, `--heap`, `--pg-tune`, `--autostart`, `--no-autostart`, `--proxy <url>\|system\|none\|detect`, `--proxy-bypass <hosts>\|none`: change them and restart what they affect |
 | `logs [app\|postgres\|installer]` | the last lines of a log (`--lines <n>`, default 50; `--follow` keeps printing) |
 | `doctor` | diagnostics: disk, system libraries, the installed files, OCR, ports, autostart |
 | `uninstall` | `--keep-data` or `--delete-data`, with `--yes` |
@@ -257,10 +261,68 @@ enterfind config --bind local         # this computer only
 enterfind config --heap 4g            # Java memory
 enterfind config --pg-tune work_mem=64MB   # a PostgreSQL setting; --pg-tune auto: the computed ones
 enterfind config --no-autostart       # see "Running in the background"
+enterfind config --proxy detect       # take the proxy of this terminal again (see "Behind a proxy")
 ```
 
 In the guided mode, **Settings** changes one value at a time. The settings live in
 `~/.enterfind/config/enterfind.toml`; you may edit it and then run `enterfind restart`.
+
+## Behind a proxy
+
+If your network reaches the internet only through an HTTP proxy, the install picks it up and
+records it, so that everything later uses it the same way, also when Enterfind is started by
+autostart after a restart (which does not see your terminal's settings):
+
+- In the terminal you install from, set `HTTPS_PROXY` before running the install line
+  (`export HTTPS_PROXY=http://proxy.example:3128`, or in PowerShell
+  `$env:HTTPS_PROXY = "http://proxy.example:3128"`); the install uses it and records it. Hosts
+  in `NO_PROXY` are recorded as reached directly.
+- On Windows and macOS, without `HTTPS_PROXY`, the install uses the computer's proxy settings
+  (Windows: Settings › Network & internet › Proxy, "Manual proxy setup"; macOS: System Settings ›
+  Network › Details › Proxies, "Secure web proxy (HTTPS)", else "Web proxy (HTTP)") and
+  **follows them**: when they change, Enterfind restarts on
+  the new proxy within a few minutes.
+- The install shows the proxy and where it came from before downloading anything.
+
+What uses the proxy: the installer's downloads and update checks, and in Enterfind its remote
+access, the downloads of its AI models, cloud AI providers and S3 storage. Hosts on your own
+network, such as an Ollama server or a MinIO store, belong in the bypass list.
+
+```sh
+enterfind config --proxy http://proxy.example:3128   # all outbound connections through this proxy
+enterfind config --proxy-bypass corp.lan,.minio.local # hosts reached directly
+enterfind config --proxy system                       # follow the computer's settings (Windows, macOS)
+enterfind config --proxy detect                       # take this terminal's proxy (or the computer's) again
+enterfind config --proxy none                         # direct connections again
+```
+
+Only `http://host:port` proxies are supported, without a password. A proxy auto-config script
+(PAC) cannot be used: the installer says so; ask for the proxy's address and give it with
+`--proxy`. `enterfind status` shows the proxy in use; `enterfind doctor` warns when it does
+not answer, or when the terminal you run it in has a different one.
+
+On a Mac:
+
+- When the proxy is on your local network, macOS asks once whether Enterfind (`enterfind`, and
+  the Java it runs on) may "find devices on your local network". Allow it: without it, Enterfind
+  started at login cannot reach the proxy. If you declined, turn it on in System Settings ›
+  Privacy & Security › Local Network.
+- While the Mac has a proxy set in its settings, the Enterfind server uses that one, whatever
+  `config --proxy` says (Java on macOS takes it from the Mac's settings), with the Mac's
+  exceptions instead of `--proxy-bypass`; the installer's own downloads follow `config --proxy`.
+  With the default (`system`) both are the same. Hosts the server must reach directly belong in
+  the Mac's proxy exceptions ("Bypass proxy settings for these hosts & domains").
+
+If the proxy does not answer when Enterfind starts, it starts anyway (searching your own files
+needs no internet) and `enterfind status` says so, with the time. Its internet features work
+again by themselves once the proxy answers (Remote Access retries within a few minutes); the note
+in `status` stays until the next start.
+
+The computer's name lookups (DNS) should answer, even if only with "not found". In a network
+that silently drops them, the installer waits for each lookup to time out before it uses the
+proxy: on Linux it shortens that wait to a second or two; on Windows the first connection of a
+command typically waits 12–15 seconds, later ones are fast; on macOS each new connection can take
+as long as the computer's DNS timeout.
 
 ## Logs and diagnostics
 
@@ -331,6 +393,11 @@ says so and `doctor` warns. Install `cron` (or `cronie`) and start its service, 
 **Linux with systemd: stops at logout.** Then lingering is off for your user and could not be
 turned on. Ask an administrator for `loginctl enable-linger <user>`, then run `enterfind config
 --autostart`.
+
+**Downloads fail behind a proxy.** Set `HTTPS_PROXY` in the terminal and run the install again,
+or give the proxy with `--proxy http://host:port`. Once installed, `enterfind config --proxy
+detect` takes the terminal's proxy, `enterfind config --proxy http://host:port` sets one. The
+error says which proxy was used and where it came from.
 
 **"another enterfind is running".** Another installer or the autostart check is working on the
 installation. Wait a minute and try again.
